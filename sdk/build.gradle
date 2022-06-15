@@ -1,7 +1,11 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id 'maven-publish'
 }
+
+group = 'com.netpluspay.contactless'
+version = '1.0.0'
 
 android {
     compileSdk 32
@@ -40,7 +44,25 @@ dependencies {
     implementation("commons-lang:commons-lang:2.6")
     implementation 'com.airbnb.android:lottie:5.2.0'
     implementation 'com.google.code.gson:gson:2.9.0'
+    implementation project(":ttpkernel")
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            // Creates a Maven publication called "release".
+            release(MavenPublication) {
+                // Applies the component for the release build variant.
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.netpluspay.contactless'
+                artifactId = 'contactless-sdk'
+                version = '1.0.0'
+            }
+        }
+    }
 }

@@ -1,0 +1,7 @@
+
+
+
+
+
+-keepresourcefiles assets/tcgetconfig.xml,com/c/c/a-,com/c/c/b-,com/visa/vac/tc/c-,com/visa/vac/tc/d-
+
