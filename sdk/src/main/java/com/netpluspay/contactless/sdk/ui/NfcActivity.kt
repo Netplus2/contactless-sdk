@@ -32,11 +32,10 @@ import com.netpluspay.contactless.sdk.utils.dismissIfShowing
 import com.netpluspay.contactless.sdk.utils.highlightTexts
 import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.TransactionProcessLoggerImpl
 import com.netpluspay.contactless.sdk.ui.dialog.PasswordDialog
-import com.netpluspay.contactless.sdk.utils.Constants
-import com.netpluspay.contactless.sdk.utils.Constants.INTENT_EXTRA_AMOUNT
-import com.netpluspay.contactless.sdk.utils.Constants.INTENT_EXTRA_CASHBACK_AMOUNT
-import com.netpluspay.contactless.sdk.utils.Constants.INTENT_PIN_KEY
-import com.netpluspay.contactless.sdk.utils.Constants.RESULT_ERROR
+import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_EXTRA_AMOUNT
+import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_EXTRA_CASHBACK_AMOUNT
+import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_PIN_KEY
+import com.netpluspay.contactless.sdk.utils.ContactlessReaderResult
 import com.visa.app.ttpkernel.ContactlessConfiguration
 import com.visa.app.ttpkernel.ContactlessKernel
 
@@ -101,14 +100,14 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         amount = intent.getDoubleExtra(INTENT_EXTRA_AMOUNT, 0.0)
         cashBackAmount = intent.getDoubleExtra(INTENT_EXTRA_CASHBACK_AMOUNT, 0.0)
         if (pinKey == null) {
-            setResult(RESULT_ERROR, intent.apply {
+            setResult(ContactlessReaderResult.RESULT_ERROR, intent.apply {
                 putExtra("message", "pin key not supplied")
             })
             finish()
             return
         }
         if (amount == 0.0) {
-            setResult(RESULT_ERROR, intent.apply {
+            setResult(ContactlessReaderResult.RESULT_ERROR, intent.apply {
                 putExtra("message", "amount not set")
             })
             finish()
@@ -153,7 +152,7 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         }
         viewModel.iccCardHelperLiveData.observe(this) { event ->
             event.getContentIfNotHandled()?.let { cardHelper ->
-                setResult(Constants.RESULT_OK, Intent().apply {
+                setResult(ContactlessReaderResult.RESULT_OK, Intent().apply {
                     putExtra("data", Gson().toJson(cardHelper))
                 })
                 finish()
@@ -264,7 +263,7 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
                         )
                     }.setNegativeButton("Cancel") { dialog, _ ->
                         dialog.cancel()
-                        setResult(RESULT_ERROR, Intent().apply {
+                        setResult(ContactlessReaderResult.RESULT_ERROR, Intent().apply {
                             putExtra("message", "NFC not enabled")
                         })
                         finish()
