@@ -172,6 +172,7 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
                 setCancelable(false)
                     .setNegativeButton("Cancel") { dialog, _ ->
                         dialog.cancel()
+                        viewModel.stopNfcReader()
                         finish()
                     }
             }.create()

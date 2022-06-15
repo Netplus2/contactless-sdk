@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.13697916666666668" />
         <entry key="sdk/src/main/res/drawable/ic_cal_clear.xml" value="0.2245" />
         <entry key="sdk/src/main/res/drawable/services_edittext_background.xml" value="0.201" />
         <entry key="sdk/src/main/res/layout/dialog_contatcless_reader.xml" value="0.3729166666666667" />

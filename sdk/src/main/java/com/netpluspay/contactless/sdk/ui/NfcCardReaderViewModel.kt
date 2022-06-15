@@ -80,6 +80,9 @@ class NfcCardReaderViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         icc.clear()
+        transactionsApi = null
+        outcomeObserver = null
+        stopNfcReader()
     }
 
     fun initiateNfcPayment(amount: Long, cashBackAmount: Long, nfcPaymentType: NfcPaymentType) {
@@ -339,8 +342,10 @@ class NfcCardReaderViewModel : ViewModel() {
         }
     }
 
-    fun finishNfcReading() {
+    private fun finishNfcReading() {
         _enableNfcForegroundDispatcher.postValue(Event(false))
         _iccCardHelperLiveData.postValue(Event(iccCardHelper))
     }
+
+
 }
