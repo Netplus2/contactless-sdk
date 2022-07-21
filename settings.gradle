@@ -10,11 +10,11 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        mavenLocal()
         maven {
             url "https://jitpack.io"
-            credentials { username "jp_pu7ojngb1e7ta0abhg90653ng2" }
+            credentials { username "jp_h2namglqo2okk0oc6um0t9f61k" }
         }
-        mavenLocal()
     }
 }
 rootProject.name = "Contactless SDK"
