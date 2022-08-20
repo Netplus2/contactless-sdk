@@ -43,7 +43,7 @@ class MainActivity : AppCompatActivity() {
             ContactlessSdk.readContactlessCard(this,
                 resultLauncher,
                 "86CBCDE3B0A22354853E04521686863D",
-                10.0)
+                100000.0)
         }
     }
 
