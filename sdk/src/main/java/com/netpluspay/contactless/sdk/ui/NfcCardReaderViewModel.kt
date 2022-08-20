@@ -286,16 +286,19 @@ class NfcCardReaderViewModel : ViewModel() {
             override fun onTransactionDeclined() {
                 Looper.prepare()
                 _showWaitingDialog.postValue(Event(null))
+                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: Transaction declined"))))
             }
 
             override fun onApplicationEnded() {
                 Looper.prepare()
                 _showWaitingDialog.postValue(Event(null))
+                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: application ended"))))
             }
 
             override fun onTransactionCancelled() {
                 Looper.prepare()
                 _showWaitingDialog.postValue(Event(null))
+                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: transaction cancelled"))))
             }
 
             override fun logToScreen(s: String?) {
@@ -304,6 +307,7 @@ class NfcCardReaderViewModel : ViewModel() {
 
             override fun onTransactionError(message: String?) {
                 _message.value = Event(message)
+                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: $message"))))
             }
         })
 
