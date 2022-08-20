@@ -152,7 +152,8 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         }
         viewModel.iccCardHelperLiveData.observe(this) { event ->
             event.getContentIfNotHandled()?.let { cardHelper ->
-                setResult(ContactlessReaderResult.RESULT_OK, Intent().apply {
+                val resultCode = if (cardHelper.error != null) ContactlessReaderResult.RESULT_ERROR else ContactlessReaderResult.RESULT_OK
+                setResult(resultCode, Intent().apply {
                     putExtra("data", Gson().toJson(cardHelper))
                 })
                 finish()
