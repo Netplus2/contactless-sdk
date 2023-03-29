@@ -3,28 +3,23 @@
 package com.netpluspay.contactless.sdk.card
 
 import android.app.Activity
-import android.app.ProgressDialog
 import android.view.LayoutInflater
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.netpluspay.contactless.sdk.databinding.DialogSelectCardschemeBinding
 import com.netpluspay.contactless.sdk.taponphone.visa.NfcPaymentType
 import com.netpluspay.contactless.sdk.utils.Event
 
-
 data class ICCCardHelper(
     var cardReadResult: CardReadResult? = null,
     var cardScheme: String? = null,
-    var error: Throwable? = null,
+    var error: Throwable? = null
 )
 
 fun showCardDialog(
-    context: Activity,
+    context: Activity
 ): LiveData<Event<NfcPaymentType?>> {
     val liveData: MutableLiveData<Event<NfcPaymentType?>> = MutableLiveData()
     showSelectCardDialog(context, liveData)

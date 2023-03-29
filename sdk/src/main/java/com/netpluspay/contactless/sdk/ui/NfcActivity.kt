@@ -24,21 +24,20 @@ import com.netpluspay.contactless.sdk.card.NFC_B_TAG
 import com.netpluspay.contactless.sdk.card.showCardDialog
 import com.netpluspay.contactless.sdk.databinding.DialogContatclessReaderBinding
 import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.*
+import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.TransactionProcessLoggerImpl
 import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.nfc.NFCManager.READER_FLAGS
 import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.nfc.NfcProvider
 import com.netpluspay.contactless.sdk.taponphone.visa.LiveNfcTransReceiver
 import com.netpluspay.contactless.sdk.taponphone.visa.NfcPaymentType
-import com.netpluspay.contactless.sdk.utils.dismissIfShowing
-import com.netpluspay.contactless.sdk.utils.highlightTexts
-import com.netpluspay.contactless.sdk.taponphone.mastercard.implementations.TransactionProcessLoggerImpl
 import com.netpluspay.contactless.sdk.ui.dialog.PasswordDialog
 import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_EXTRA_AMOUNT
 import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_EXTRA_CASHBACK_AMOUNT
 import com.netpluspay.contactless.sdk.utils.ContactlessConstants.INTENT_PIN_KEY
 import com.netpluspay.contactless.sdk.utils.ContactlessReaderResult
+import com.netpluspay.contactless.sdk.utils.dismissIfShowing
+import com.netpluspay.contactless.sdk.utils.highlightTexts
 import com.visa.app.ttpkernel.ContactlessConfiguration
 import com.visa.app.ttpkernel.ContactlessKernel
-
 
 class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
     private lateinit var transactionsApi: TransactionInterface
@@ -64,7 +63,7 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
             resultLauncher: ActivityResultLauncher<Intent>,
             pinKey: String,
             amount: Double,
-            cashBackAmount: Double = 0.0,
+            cashBackAmount: Double = 0.0
         ) {
             val intent = Intent(context, NfcActivity::class.java)
             resultLauncher.launch(packIntent(intent, pinKey, amount, cashBackAmount))
@@ -72,20 +71,24 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
 
         @Deprecated(message = "use startActivity with result launcher")
         internal fun startActivity(
-            context: Activity, requestCode: Int, pinKey: String,
+            context: Activity,
+            requestCode: Int,
+            pinKey: String,
             amount: Double,
-            cashBackAmount: Double = 0.0,
+            cashBackAmount: Double = 0.0
         ) {
             val intent = Intent(context, NfcActivity::class.java)
-            context.startActivityForResult(packIntent(intent, pinKey, amount, cashBackAmount),
-                requestCode)
+            context.startActivityForResult(
+                packIntent(intent, pinKey, amount, cashBackAmount),
+                requestCode
+            )
         }
 
         private fun packIntent(
             intent: Intent,
             pinKey: String,
             amount: Double,
-            cashBackAmount: Double,
+            cashBackAmount: Double
         ) = intent.apply {
             putExtra(INTENT_PIN_KEY, pinKey)
             putExtra(INTENT_EXTRA_AMOUNT, amount)
@@ -100,16 +103,22 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         amount = intent.getDoubleExtra(INTENT_EXTRA_AMOUNT, 0.0)
         cashBackAmount = intent.getDoubleExtra(INTENT_EXTRA_CASHBACK_AMOUNT, 0.0)
         if (pinKey == null) {
-            setResult(ContactlessReaderResult.RESULT_ERROR, intent.apply {
-                putExtra("message", "pin key not supplied")
-            })
+            setResult(
+                ContactlessReaderResult.RESULT_ERROR,
+                intent.apply {
+                    putExtra("message", "pin key not supplied")
+                }
+            )
             finish()
             return
         }
         if (amount == 0.0) {
-            setResult(ContactlessReaderResult.RESULT_ERROR, intent.apply {
-                putExtra("message", "amount not set")
-            })
+            setResult(
+                ContactlessReaderResult.RESULT_ERROR,
+                intent.apply {
+                    putExtra("message", "amount not set")
+                }
+            )
             finish()
             return
         }
@@ -121,14 +130,14 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         observeViewModels()
     }
 
-
     private fun observeViewModels() {
         viewModel.enableNfcForegroundDispatcher.observe(this) { event ->
             event.getContentIfNotHandled()?.let {
-                if (it)
+                if (it) {
                     startNfcPayment()
-                else
+                } else {
                     stopNfcPayment()
+                }
             }
         }
         viewModel.showPinPadDialog.observe(this) { event ->
@@ -153,10 +162,13 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         viewModel.iccCardHelperLiveData.observe(this) { event ->
             event.getContentIfNotHandled()?.let { cardHelper ->
                 val resultCode = if (cardHelper.error != null) ContactlessReaderResult.RESULT_ERROR else ContactlessReaderResult.RESULT_OK
-                val resultKey = if (cardHelper.error !=  null) "message" else "data"
-                setResult(resultCode, Intent().apply {
-                    putExtra(resultKey, Gson().toJson(cardHelper))
-                })
+                val resultKey = if (cardHelper.error != null) "message" else "data"
+                setResult(
+                    resultCode,
+                    Intent().apply {
+                        putExtra(resultKey, Gson().toJson(cardHelper))
+                    }
+                )
                 finish()
                 return@observe
             }
@@ -166,7 +178,6 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
     private fun setupUi() {
         dialogContactlessReaderBinding =
             DialogContatclessReaderBinding.inflate(layoutInflater).apply {
-
             }
         waitingDialog = AlertDialog.Builder(this)
             .apply {
@@ -185,22 +196,25 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
         val myData = contactlessConfiguration.terminalData
         myData["9F1A"] = byteArrayOf(0x05, 0x66) // set terminal country code
         myData["5F2A"] = byteArrayOf(0x05, 0x66) // set currency code
-        myData["9F35"] = byteArrayOf(0x22) //Terminal Type
-        myData["009C"] = byteArrayOf(0x00) //Transaction Type 00 - Purchase; 20 - Refund
+        myData["9F35"] = byteArrayOf(0x22) // Terminal Type
+        myData["009C"] = byteArrayOf(0x00) // Transaction Type 00 - Purchase; 20 - Refund
         myData["9F09"] = byteArrayOf(0x00, 0x8C.toByte())
         myData["9F66"] =
-            byteArrayOf(0xE6.toByte(), 0x00.toByte(), 0x40.toByte(), 0x00.toByte()) //TTQ E6004000
+            byteArrayOf(0xE6.toByte(), 0x00.toByte(), 0x40.toByte(), 0x00.toByte()) // TTQ E6004000
         myData["9F33"] =
-            byteArrayOf(0xE0.toByte(), 0xF8.toByte(), 0xC8.toByte()) //Terminal Capabilities
+            byteArrayOf(0xE0.toByte(), 0xF8.toByte(), 0xC8.toByte()) // Terminal Capabilities
         myData["9F40"] = byteArrayOf(
             0x60.toByte(),
-            0x00.toByte(), 0x00.toByte(), 0x50.toByte(), 0x01.toByte()
-        ) //Additional Terminal Capabilities
+            0x00.toByte(),
+            0x00.toByte(),
+            0x50.toByte(),
+            0x01.toByte()
+        ) // Additional Terminal Capabilities
         val mercahnt = "NetPOS Contactless"
         val merchantByte = mercahnt.toByteArray()
-        myData["9F4E"] = merchantByte //Merchant Name and location
-        myData["9F1B"] = byteArrayOf(0x00, 0x00, 0x00, 0x00) //terminal floor limit
-        myData["DF01"] = byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x01) //Reader CVM Required Limit
+        myData["9F4E"] = merchantByte // Merchant Name and location
+        myData["9F1B"] = byteArrayOf(0x00, 0x00, 0x00, 0x00) // terminal floor limit
+        myData["DF01"] = byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x01) // Reader CVM Required Limit
         contactlessConfiguration.terminalData = myData
     }
 
@@ -266,17 +280,22 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
                         )
                     }.setNegativeButton("Cancel") { dialog, _ ->
                         dialog.cancel()
-                        setResult(ContactlessReaderResult.RESULT_ERROR, Intent().apply {
-                            putExtra("message", "NFC not enabled")
-                        })
+                        setResult(
+                            ContactlessReaderResult.RESULT_ERROR,
+                            Intent().apply {
+                                putExtra("message", "NFC not enabled")
+                            }
+                        )
                         finish()
                     }.show()
             } else {
                 showCardDialog(this).observe(this) { event ->
                     event.getContentIfNotHandled()?.let {
-                        viewModel.initiateNfcPayment(amount.times(100).toLong(),
+                        viewModel.initiateNfcPayment(
+                            amount.times(100).toLong(),
                             cashBackAmount.times(100).toLong(),
-                            it)
+                            it
+                        )
                     }
                 }
             }
@@ -328,7 +347,7 @@ class NfcActivity : AppCompatActivity(), NfcAdapter.ReaderCallback {
                 override fun onError(message: String?) {
                     viewModel.setIccCardHelperLiveData(ICCCardHelper(error = Throwable(message)))
                 }
-
-            }).showDialog()
+            }
+        ).showDialog()
     }
 }

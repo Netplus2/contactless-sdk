@@ -76,7 +76,6 @@ class NfcCardReaderViewModel : ViewModel() {
         MutableLiveData(null)
     }
 
-
     override fun onCleared() {
         super.onCleared()
         icc.clear()
@@ -99,7 +98,7 @@ class NfcCardReaderViewModel : ViewModel() {
 
     fun doVisaTransaction(
         nfcTransceiver: LiveNfcTransReceiver,
-        contactlessKernel: ContactlessKernel,
+        contactlessKernel: ContactlessKernel
     ) {
         iccCardHelper = ICCCardHelper()
         icc.clear()
@@ -182,9 +181,10 @@ class NfcCardReaderViewModel : ViewModel() {
                 if (value1 != null) {
                     key = key1 as String
                     value = Utils.getHexString(value1) as String
-                    if (key in REQUIRED_TAGS)
+                    if (key in REQUIRED_TAGS) {
                         icc.append(value)
-                    //mainLog.text = mainLog.text.toString() + "\n" + key + ":" + value
+                    }
+                    // mainLog.text = mainLog.text.toString() + "\n" + key + ":" + value
                 }
             }
 
@@ -194,8 +194,9 @@ class NfcCardReaderViewModel : ViewModel() {
                 key = key1 as String
                 if (value1 != null) {
                     value = Utils.getHexString(value1) as String
-                    if (key in REQUIRED_TAGS)
+                    if (key in REQUIRED_TAGS) {
                         icc.append(value)
+                    }
                 }
             }
             val internalData = contactlessResult.internalData
@@ -203,8 +204,9 @@ class NfcCardReaderViewModel : ViewModel() {
                 if (value1 != null) {
                     key = key1 as String
                     value = Utils.getHexString(value1) as String
-                    if (key in REQUIRED_TAGS)
+                    if (key in REQUIRED_TAGS) {
                         icc.append(value)
+                    }
                 }
             }
             selectedAid = if (outcome == TtpOutcome.TRYNEXT) {
@@ -268,70 +270,66 @@ class NfcCardReaderViewModel : ViewModel() {
 
     private fun doMasterCardTransaction() {
         outcomeObserver?.resetObserver(object :
-            TransactionListener {
-            override fun onTransactionSuccessful() {
-
-            }
-
-            override fun onOnlineReferral(cardData: CardReadResult, pan: String) {
-                iccCardHelper.apply {
-                    this.cardReadResult = cardData
-                    cardScheme = NfcPaymentType.MASTERCARD.name
+                TransactionListener {
+                override fun onTransactionSuccessful() {
                 }
-                Looper.prepare()
-                _showWaitingDialog.postValue(Event(null))
-                _showPinPadDialog.postValue(Event(pan))
-            }
 
-            override fun onTransactionDeclined() {
-                Looper.prepare()
-                _showWaitingDialog.postValue(Event(null))
-                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: Transaction declined"))))
-            }
+                override fun onOnlineReferral(cardData: CardReadResult, pan: String) {
+                    iccCardHelper.apply {
+                        this.cardReadResult = cardData
+                        cardScheme = NfcPaymentType.MASTERCARD.name
+                    }
+                    Looper.prepare()
+                    _showWaitingDialog.postValue(Event(null))
+                    _showPinPadDialog.postValue(Event(pan))
+                }
 
-            override fun onApplicationEnded() {
-                Looper.prepare()
-                _showWaitingDialog.postValue(Event(null))
-                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: application ended"))))
-            }
+                override fun onTransactionDeclined() {
+                    Looper.prepare()
+                    _showWaitingDialog.postValue(Event(null))
+                    _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: Transaction declined"))))
+                }
 
-            override fun onTransactionCancelled() {
-                Looper.prepare()
-                _showWaitingDialog.postValue(Event(null))
-                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: transaction cancelled"))))
-            }
+                override fun onApplicationEnded() {
+                    Looper.prepare()
+                    _showWaitingDialog.postValue(Event(null))
+                    _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: application ended"))))
+                }
 
-            override fun logToScreen(s: String?) {
+                override fun onTransactionCancelled() {
+                    Looper.prepare()
+                    _showWaitingDialog.postValue(Event(null))
+                    _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: transaction cancelled"))))
+                }
 
-            }
+                override fun logToScreen(s: String?) {
+                }
 
-            override fun onTransactionError(message: String?) {
-                _message.value = Event(message)
-                _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: $message"))))
-            }
-        })
+                override fun onTransactionError(message: String?) {
+                    _message.value = Event(message)
+                    _iccCardHelperLiveData.postValue(Event(ICCCardHelper(error = Throwable("Error occurred while reading card: $message"))))
+                }
+            })
 
         transactionsApi?.initiatePayment(object :
-            PaymentDataProvider {
-            override fun getPaymentDataMap(): HashMap<Int, ByteArrayWrapper> {
-                val map = HashMap<Int, ByteArrayWrapper>()
-                map.apply {
-                    put(0x9F02, amountInBytes)
-                    put(
-                        0x9F03,
-                        cashBackAmountInBytes
-                    )
-                    put(0x5F2A, ByteArrayWrapper("0566"))
-                    put(0x9F1A, ByteArrayWrapper("0566"))
+                PaymentDataProvider {
+                override fun getPaymentDataMap(): HashMap<Int, ByteArrayWrapper> {
+                    val map = HashMap<Int, ByteArrayWrapper>()
+                    map.apply {
+                        put(0x9F02, amountInBytes)
+                        put(
+                            0x9F03,
+                            cashBackAmountInBytes
+                        )
+                        put(0x5F2A, ByteArrayWrapper("0566"))
+                        put(0x9F1A, ByteArrayWrapper("0566"))
+                    }
+                    return map
                 }
-                return map
-            }
 
-            override fun setPaymentDataEntry(p0: Int?, p1: ByteArrayWrapper?) {
-
-            }
-
-        })
+                override fun setPaymentDataEntry(p0: Int?, p1: ByteArrayWrapper?) {
+                }
+            })
     }
 
     fun setIccCardHelperLiveData(iccCardHelper: ICCCardHelper) {
@@ -342,7 +340,6 @@ class NfcCardReaderViewModel : ViewModel() {
         try {
             transactionsApi?.abortTransaction()
         } catch (e: Exception) {
-
         }
     }
 
@@ -350,6 +347,4 @@ class NfcCardReaderViewModel : ViewModel() {
         _enableNfcForegroundDispatcher.postValue(Event(false))
         _iccCardHelperLiveData.postValue(Event(iccCardHelper))
     }
-
-
 }

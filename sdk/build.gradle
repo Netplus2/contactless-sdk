@@ -1,4 +1,4 @@
-plugins {
+ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'maven-publish'
@@ -61,7 +61,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.netpluspay.contactless'
                 artifactId = 'contactless-sdk'
-                version = '1.0.0'
+                version = '1.0.9'
             }
         }
     }

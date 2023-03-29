@@ -46,8 +46,8 @@
               "data": [
                 "ContactlessMposPilot",
                 "KernelConfig:20",
-                "ReaderCTLOndevice:000010000000",
-                "ReaderCTLNoOndevice:000010000000"
+                "ReaderCTLOndevice:001000000000",
+                "ReaderCTLNoOndevice:001000000000"
               ]
             },
             {
@@ -59,8 +59,8 @@
               "data": [
                 "ContactlessMposPilot",
                 "KernelConfig:A0",
-                "ReaderCTLOndevice:000010000000",
-                "ReaderCTLNoOndevice:000010000000"
+                "ReaderCTLOndevice:001000000000",
+                "ReaderCTLNoOndevice:001000000000"
               ]
             },
             {
@@ -72,8 +72,8 @@
               "data": [
                 "ContactlessMposPilot",
                 "KernelConfig:A0",
-                "ReaderCTLOndevice:000010000000",
-                "ReaderCTLNoOndevice:000010000000"
+                "ReaderCTLOndevice:001000000000",
+                "ReaderCTLNoOndevice:001000000000"
               ]
             }
           ]

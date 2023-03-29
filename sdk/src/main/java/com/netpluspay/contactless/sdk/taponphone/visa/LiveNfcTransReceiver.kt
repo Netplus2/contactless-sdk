@@ -22,14 +22,13 @@ class LiveNfcTransReceiver(
             throw IOException(e.message)
         }
         rawResponse = response
-        //iccData.append(BytesUtils.bytesToString(response))
+        // iccData.append(BytesUtils.bytesToString(response))
         log.append("<font color='blue'><b>resp:</b> " + BytesUtils.bytesToString(response))
             .append("</font><br/>")
         return response!!
     }
 
     override fun destroy() {
-
     }
 
     override fun isCardPresent(): Boolean {

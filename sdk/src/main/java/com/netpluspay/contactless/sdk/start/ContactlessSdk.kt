@@ -12,18 +12,24 @@ object ContactlessSdk {
         resultLauncher: ActivityResultLauncher<Intent>,
         pinKey: String,
         amount: Double,
-        cashBackAmount: Double = 0.0,
+        cashBackAmount: Double = 0.0
     ) {
         NfcActivity.startActivity(context, resultLauncher, pinKey, amount, cashBackAmount)
     }
 
-    @Deprecated(message = "use readContactlessCard with result launcher",
-        replaceWith = ReplaceWith("ContactlessSdk.readContactlessCard(context, resultLauncher, pinKey, amount, cashBackAmount)",
-            "com.netpluspay.contactless.sdk.start.ContactlessSdk"))
+    @Deprecated(
+        message = "use readContactlessCard with result launcher",
+        replaceWith = ReplaceWith(
+            "ContactlessSdk.readContactlessCard(context, resultLauncher, pinKey, amount, cashBackAmount)",
+            "com.netpluspay.contactless.sdk.start.ContactlessSdk"
+        )
+    )
     fun readContactlessCard(
-        context: Activity, requestCode: Int, pinKey: String,
+        context: Activity,
+        requestCode: Int,
+        pinKey: String,
         amount: Double,
-        cashBackAmount: Double = 0.0,
+        cashBackAmount: Double = 0.0
     ) {
         NfcActivity.startActivity(context, requestCode, pinKey, amount, cashBackAmount)
     }
